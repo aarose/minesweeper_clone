@@ -1,12 +1,12 @@
 #!/usr/bin/python
 from collections import namedtuple
 
-from .views import create_grid, get_grid, get_cell
+from .views import GridView, CellView
 
 Route = namedtuple('Route', ['name', 'url', 'view'])
 
 routes = [
-    Route(name='grid', url='/grid', view=create_grid),
-    Route(name='grid', url='/grid/{id})', view=get_grid),
-    Route(name='cell', url='/grid/{id}/cell/{x},{y}', view=get_cell),
+    Route(name='grid', url='/grid', view=GridView),
+    Route(name='grid', url='/grid/{id})', view=GridView),
+    Route(name='cell', url='/grid/{id}/cell/{x},{y}', view=CellView),
 ]
