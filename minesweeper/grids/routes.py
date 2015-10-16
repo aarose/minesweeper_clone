@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from collections import namedtuple
 
 from .views import create_grid, get_grid, get_cell

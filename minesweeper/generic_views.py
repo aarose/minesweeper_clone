@@ -1,6 +1,4 @@
-from pyramid.response import Response
-
-
+#!/usr/bin/python
 class InvalidMethod(Exception):
     """ Raised when the request method is not allowed by the View. """
 
@@ -34,26 +32,3 @@ class View(object):
 
     def delete(self):
         raise NotImplementedError()
-
-
-def get_grid(request):
-    """ Return the serialized grid. """
-    return Response("[[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]")
-
-
-def get_cell(request):
-    """ Return the current value of the cell, and the game state. """
-    # cell = request.matchdict['cell']
-    return Response("2")
-
-    def get(self, request):
-        return Response()
-
-    def put(self, request):
-        return Response()
-
-
-def update_cell(request):
-    """ Change the state of the cell. Returns the result of the action. """
-    # cell = request.matchdict['cell']
-    return Response('F')
