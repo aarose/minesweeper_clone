@@ -1,6 +1,5 @@
 Chameleon==2.22
 coverage==4.0.1
--e git+git@bitbucket.org:aarose/smgame.git@248e0674930fdcd658a4d73ec1daa5320703cc77#egg=minesweeper-master
 nose==1.3.7
 PasteDeploy==1.5.2
 pyramid==1.5.7
