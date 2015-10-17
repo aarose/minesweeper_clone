@@ -2,7 +2,7 @@
 from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 
-from .grids.routes import routes
+from grids.routes import routes
 
 if __name__ == '__main__':
     config = Configurator()
