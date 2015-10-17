@@ -82,7 +82,7 @@ class MineMap(Matrix):
         max_mines = int(self.height * self.width * MAX_MINE_AREA)
         if mine_number > max_mines:
             raise InvalidMineAmount('%s exceeds the current mine limit of %s'
-                                    % (str(mine_number), str(max_mines)))
+                                    % (mine_number, max_mines))
         self._place_mines(mine_number, mine_value)
 
     def _random_coord(self):
