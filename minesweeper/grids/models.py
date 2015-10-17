@@ -2,8 +2,8 @@
 import sqlalchemy as db
 import sqlalchemy.orm as orm
 
-import grid.constants as const
-from models_base import (
+import minesweeper.grid.constants as const
+from minesweeper.models_base import (
     ModelBase,
     foreign_key_column,
     )

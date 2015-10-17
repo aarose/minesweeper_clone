@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import random
 
-import constants as const
+import minesweeper.grids.constants as const
 
 
 class CellStates(object):

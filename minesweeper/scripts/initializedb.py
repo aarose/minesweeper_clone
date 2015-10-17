@@ -10,7 +10,7 @@ from pyramid.paster import (
 
 from pyramid.scripts.common import parse_vars
 
-from ..models_base import (
+from minesweeper.models_base import (
     DBSession,
     Base,
 )

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from collections import namedtuple
 
-from .views import (
+from minesweeper.grids.views import (
     CellView,
     GridCreateView,
     GridDetailView,

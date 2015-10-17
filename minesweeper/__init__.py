@@ -2,7 +2,7 @@
 from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
-from .models_base import (
+from minesweeper.models_base import (
     DBSession,
     Base,
 )
