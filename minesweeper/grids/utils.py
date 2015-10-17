@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import random
 
-import grid.constants as const
+import constants as const
 
 
 class CellStates(object):
