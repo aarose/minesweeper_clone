@@ -4,6 +4,10 @@ from pyramid.response import Response
 from generic_views import View
 
 
+def home(request):
+    return Response('Standby for new game')
+
+
 class GridDetailView(View):
     allowed_methods = ['get']
 
