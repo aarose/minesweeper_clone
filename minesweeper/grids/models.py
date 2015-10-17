@@ -74,6 +74,7 @@ class MineMapData(ModelBase):
     value = db.Column(db.Integer, nullable=False)
 
     __table_args__ = (
+        db.PrimaryKeyConstraint('map_id', 'row_num', 'col_num'),
         db.CheckConstraint(row_num >= 0, name='check_row_num_positive'),
         db.CheckConstraint(col_num >= 0, name='check_col_num_positive'),
         db.CheckConstraint(value in const.MineMapDataValue.choices()),
@@ -108,6 +109,7 @@ class PlayerMapData(ModelBase):
     value = db.Column(db.Integer, nullable=False)
 
     __table_args__ = (
+        db.PrimaryKeyConstraint('map_id', 'row_num', 'col_num'),
         db.CheckConstraint(row_num >= 0, name='check_row_num_positive'),
         db.CheckConstraint(col_num >= 0, name='check_col_num_positive'),
         db.CheckConstraint(value in const.PlayerMapDataValue.choices(),
