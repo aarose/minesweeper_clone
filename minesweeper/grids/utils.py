@@ -1,8 +1,7 @@
 #!/usr/bin/python
 import random
 
-
-MAX_MINE_AREA = 0.7  # Maxium percent of area the mines can occupy
+import grid.constants as const
 
 
 class CellStates(object):
@@ -79,7 +78,7 @@ class MineMap(Matrix):
         """
         super(MineMap, self).__init__(height, width=width, **kwargs)
         # Ensure that the number of mines doesn't exceed the number of spaces
-        max_mines = int(self.height * self.width * MAX_MINE_AREA)
+        max_mines = int(self.height * self.width * const.MAX_MINE_AREA)
         if mine_number > max_mines:
             raise InvalidMineAmount('%s exceeds the current mine limit of %s'
                                     % (mine_number, max_mines))

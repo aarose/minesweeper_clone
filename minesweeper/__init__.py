@@ -2,7 +2,7 @@
 from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
-from .models import (
+from .models_base import (
     DBSession,
     Base,
 )
@@ -21,7 +21,6 @@ def main(global_config, **settings):
     for route in routes:
         config.add_route(route.name, route.url)
         config.add_view(route.view, route_name=route.name)
-    config.add_route('home', '/')
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.scan()
     return config.make_wsgi_app()
