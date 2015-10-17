@@ -6,7 +6,7 @@ from .models_base import (
     DBSession,
     Base,
 )
-from grids.routes import routes
+from minesweeper.grids.routes import routes
 
 
 def main(global_config, **settings):

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from pyramid.response import Response
 
-from generic_views import View
+from minesweeper.generic_views import View
 
 
 def home(request):
