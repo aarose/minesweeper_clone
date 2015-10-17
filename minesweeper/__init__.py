@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 
 from minesweeper.models_base import (
     DBSession,
-    Base,
+    ModelBase,
 )
 from minesweeper.grids.routes import routes
 
@@ -13,7 +13,7 @@ def main(global_config, **settings):
     # Set up database stuff
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
-    Base.metadata.bind = engine
+    ModelBase.metadata.bind = engine
 
     # Configure
     config = Configurator(settings=settings)
