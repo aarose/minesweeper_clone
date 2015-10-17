@@ -1,11 +1,11 @@
 #!/usr/bin/python
 from pyramid.response import Response
 
-from ..generic_views import View
+from generic_views import View
 
 
-class GridView(View):
-    allowed_methods = ['get', 'post']
+class GridDetailView(View):
+    allowed_methods = ['get']
 
     def get(self):
         """ Returns the serialized grid. """
@@ -14,6 +14,10 @@ class GridView(View):
         # If not found, return HTTP 404
         grid = {'contents': [[2, 0], [12, 0]], 'state': 'in-progress'}
         return Response(str(grid))
+
+
+class GridCreateView(View):
+    allowed_methods = ['post']
 
     def post(self):
         """ Creates a new grid. """
