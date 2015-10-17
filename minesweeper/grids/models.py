@@ -9,12 +9,18 @@ MAX_GRID_WIDTH = 30
 MAX_GRID_HEIGHT = 30
 
 
+class GameState(object):
+    IN_PROGRESS = 0
+    WIN = 1
+    LOSE = -1
+
+
 class InvalidGrid(Exception):
     """ Raised when the grid size or number of mines is not allowed. """
 
 
-class Grid(object):
-    """ Representation of a grid. """
+class Game(object):
+    """ Representation of a game. """
     def __init__(self, height, width, mine_number):
         if height > MAX_GRID_HEIGHT:
             raise InvalidGrid('Height cannot exceed %s' % MAX_GRID_HEIGHT)
@@ -27,6 +33,7 @@ class Grid(object):
         self.width = width
         self.height = height
         self.mine_number = mine_number
+        self.state = GameState.IN_PROGRESS
 
         # Matrices
         self.mine_map = MineMap(mine_number, height, width)
@@ -34,7 +41,7 @@ class Grid(object):
         self.flag_map = Matrix(height, width)
 
     def __str__(self):
-        """ Serialization of the grid. """
+        """ Serialization of the Game. """
         # TODO:
         return self.__class__
 
@@ -47,9 +54,9 @@ class Grid(object):
         return (self.width, self.height)
 
 
-class GridManager(object):
+class GameManager(object):
     def create(self):
-        new_grid = Grid(9, 9)
+        new_game = Game(9, 9)
         # TODO:
-        new_grid.save()  # commit to the database
-        return new_grid
+        new_game.save()  # commit to the database
+        return new_game
