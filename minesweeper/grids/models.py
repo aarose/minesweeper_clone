@@ -35,7 +35,7 @@ class Game(object):
         self.mine_number = mine_number
         self.state = GameState.IN_PROGRESS
 
-        # Matrices
+        # Matrices - TODO: One to one with Game
         self.mine_map = MineMap(mine_number, height, width)
         self.click_map = Matrix(height, width)
         self.flag_map = Matrix(height, width)
