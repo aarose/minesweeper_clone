@@ -15,7 +15,7 @@ class View(object):
 
     def dispatch(self):
         if self.request.method in map(str.upper, self.allowed_methods):
-            method = getattr(self, self.request.method)
+            method = getattr(self, self.request.method.lower())
             return method()
         else:
             # Method not allowed, raise error
