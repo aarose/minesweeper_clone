@@ -33,7 +33,7 @@ setup(name='minesweeper',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      test_suite='minesweeper',
+      test_suite='minesweeper.tests',
       install_requires=requires,
       entry_points="""\
       [paste.app_factory]
