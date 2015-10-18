@@ -113,8 +113,11 @@ class MineMatrix(Matrix):
         self.mine_count = 0
         if mine_number is not None:
             if mine_number > self.max_mines:
-                raise InvalidMineAmount('%s exceeds the current mine limit of',
-                                        '%s' % (mine_number, self.max_mines))
+                raise InvalidMineAmount(
+                    '%s exceeds the current mine limit of %s' % (
+                        mine_number,
+                        self.max_mines,
+                    ))
 
             self._randomly_place_mines(mine_number)
 
