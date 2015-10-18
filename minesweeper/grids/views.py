@@ -9,7 +9,16 @@ from pyramid.httpexceptions import (
     )
 
 from minesweeper.models_base import DBSession
-from minesweeper.grids.models import Game
+from minesweeper.grids.models import (
+    # Game,
+    MineMap,
+    )
+from minesweeper.grids.utils import MineMatrix
+
+
+MAIN_TEMPLATE = 'minesweeper:templates/index.html.mako'
+DEFAULT_HEIGHT = 9
+DEFAULT_MINES = 10
 
 
 @view_defaults(route_name='home')
@@ -17,25 +26,27 @@ class Home(object):
     def __init__(self, request):
         self.request = request
 
-    @view_config(request_method='GET', renderer='minesweeper:templates/index.html.mako')
-    def get(request):
+    @view_config(request_method='GET', renderer=MAIN_TEMPLATE)
+    def get(self):
         return {'game': False}
 
     @view_config(request_method='POST')
-    def post(self, request):
-        # grid_id = create_game()
-        grid_id = 1
-        return HTTPFound(location=request.route_url('view_game',
-                                                    grid_id=grid_id))
+    def post(self):
+        # Create a new game
+        mine_matrix = MineMatrix(DEFAULT_MINES, DEFAULT_HEIGHT)
+        mine_map = mine_matrix.to_model()
+        return HTTPFound(location=self.request.route_url('view_game',
+                                                         game_id=mine_map.id))
 
 
 @view_config(route_name='view_game', request_method='GET', http_cache=3600,
-             renderer='minesweeper:templates/index.html.mako')
+             renderer=MAIN_TEMPLATE)
 def view_game(request):
     """ Returns the game. """
     game_id = request.matchdict['game_id']
-    game = DBSession.query(Game).get(game_id)
-    if game is None:
+    # game = DBSession.query(Game).get(game_id)
+    mine_map = DBSession.query(MineMap).get(game_id)
+    if mine_map is None:
         return HTTPNotFound('No such game.')
     # game = {'contents': [[2, 0], [12, 0]], 'state': 'in-progress'}
     return {'game': True, 'height': 2, 'width': 3}
