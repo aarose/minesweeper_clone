@@ -4,6 +4,7 @@ import sqlalchemy.orm as orm
 
 import minesweeper.grids.constants as const
 from minesweeper.models_base import (
+    DBSession,
     ModelBase,
     foreign_key_column,
     )
@@ -59,8 +60,19 @@ class MineMap(ModelBase):
     """ MineMap model. """
     __tablename__ = 'mine_maps'
     id = db.Column(db.Integer, primary_key=True)
-    map_data = orm.relationship("MineMapData", backref="mine_maps",
+    map_data = orm.relationship("MineMapData", backref="map_id",
                                 order_by="MineMapData.row_num")
+
+    def to_matrix(self):
+        from minesweeper.grids.utils import Matrix
+        # The height and width are the max values in row and col
+        height = DBSession.query(db.func.max(MineMapData.row_num))
+        width = DBSession.query(db.func.max(MineMapData.col_num))
+        matrix = Matrix(height, width)
+        for entry in self.map_data:
+            # Each needs to be inserted into the proper place
+            pass
+        return matrix
 
 
 class MineMapData(ModelBase):
@@ -87,7 +99,7 @@ class PlayerMap(ModelBase):
     id = db.Column(db.Integer, primary_key=True)
     game_id = foreign_key_column(None, db.Integer, "games.id")
     map_type = db.Column(db.Text, nullable=False)
-    map_data = orm.relationship("PlayerMapData", backref="player_maps",
+    map_data = orm.relationship("PlayerMapData", backref="map_id",
                                 order_by="PlayerMapData.row_num")
 
     __table_args__ = (
