@@ -4,6 +4,7 @@ from pyramid.view import (
     view_defaults,
     )
 from pyramid.httpexceptions import (
+    HTTPForbidden,
     HTTPFound,
     HTTPNotFound,
     )
@@ -53,21 +54,16 @@ class Home(object):
              renderer=const.MAIN_TEMPLATE)
 def view_game(request):
     """ Returns the game. """
-    game_id = request.matchdict['game_id']
-    game = DBSession.query(models.Game).get(game_id)
+    game = get_game_or_none(request)
     if game is None:
         return HTTPNotFound('No such game.')
 
+    # Get the MineMap
     mine_map = DBSession.query(models.MineMap).get(game.mine_map)
     number_of_mines = DBSession.query(models.MineMapData).filter_by(
         mine_map_id=mine_map.id).count()
 
-    # Derive the grid (mine matrix * click matrix)
-    mine_matrix = mine_map.to_matrix()
-    click_map = DBSession.query(models.PlayerMap).filter_by(
-        game_id=game.id, map_type=const.PlayerMapType.CLICK).first()
-    click_matrix = click_map.to_matrix()  # Acts as a mask
-    grid = multiply(mine_matrix, click_matrix)
+    grid = derive_grid(mine_map, game.id)
 
     response = {
         'game': True,
@@ -80,47 +76,112 @@ def view_game(request):
     return response
 
 
-"""
-@view_config(route_name='cell_get', request_method='GET', renderer='json')
-def get(request):
-    "" Returns the value of the cell in the grid, and the game state. ""
-    # grid_id = self.request.matchdict[grid_id]
-    # cell_x = self.request.matchdict['x']
-    # cell_y = self.request.matchdict['y']
-    # grid = GridManager.get(id=grid_id)
-    # Multiply the minemap by the clickmap to get the states, add the
-    cell = {'value': 0, 'state': 'in-progress'}
-    return cell
-"""
-
-
 @view_config(route_name='cell_get', request_method='POST', renderer='json')
 def update_cell(request):
     """ Executes the provided action upon the cell, returns the state. """
-    game_id = request.matchdict['game_id']
-    game = DBSession.query(models.Game).get(game_id)
+    game = get_game_or_none(request)
     if game is None:
         return HTTPNotFound('No such game.')
 
+    # If the game is not in progress (won or lost) then no action is allowed
+    if game.state != const.GameState.IN_PROGRESS:
+        return HTTPForbidden('The game is over.')
+
+    # See if there's an entry for x,y in the Click Map of this Game
     x = request.matchdict['x']
     y = request.matchdict['y']
+    click_map = DBSession.query(models.PlayerMap).filter_by(
+        game_id=game.id, map_type=const.PlayerMapType.CLICK).first()
 
-    # TODO: How to get the post data being sent in?
+    # If there's a click data entry, the cell has already been clicked
+    # No further action is allowed
+    click_data = DBSession.query(models.PlayerMapData).filter_by(
+        player_map_id=click_map.id, row_num=x, col_num=y).first()
+    if click_data:
+        return HTTPForbidden('The cell has alread been revealed.')
 
-    # If the game is not in progress (won or lost) then can't do any action
-    # raise 403 Forbidden
+    value = None
+    reveal = []
 
-    # If the action is a Left Click, then it's trying to reveal what is avail.
-    # so add entry to click map data, for next time loading, and get the
-    # MineMapData.value at x row_num and y col_num
+    action = request.POST.get('action')
+    if action is const.Action.LEFT_CLICK:
+        value, reveal = left_click(x, y, click_map, game)
 
-    # If the action is a right click, update the flag data OR delete the entry
-    # if it got reset back to 0 (no flag, no ?)
-    # Can only right click on squares that haven't been releaved yet (grid
-    # gives back a 0)
-    response = {
-        'state': game.state,
-        'value': 2,
-        'state': 'win',
-    }
-    return response
+    elif action is const.Action.RIGHT_CLICK:
+        value, reveal = right_click(x, y, game)
+
+    return {'state': game.state, 'value': value, 'reveal': reveal}
+
+
+def get_game_or_none(request):
+    game_id = request.matchdict['game_id']
+    game = DBSession.query(models.Game).get(game_id)
+    return game
+
+
+def derive_grid(mine_map, game_id):
+    """ Returns the derived grid (mine matrix * click matrix) """
+    mine_matrix = mine_map.to_matrix()
+    click_map = DBSession.query(models.PlayerMap).filter_by(
+        game_id=game_id, map_type=const.PlayerMapType.CLICK).first()
+    click_matrix = click_map.to_matrix()  # Acts as a mask
+    return multiply(mine_matrix, click_matrix)
+
+
+def left_click(x, y, click_map, game):
+    # Record a successful click on the Click Map, and reveal the cell
+    recorded_click = models.PlayerMapData(
+        player_map_id=click_map.id, row_num=x, col_num=y,
+        value=const.PlayerMapDataValue.CLICKED)
+    DBSession.add(recorded_click)
+
+    # Get this cell's true contents
+    mine_data = DBSession.query(models.MineMapData).filter_by(
+        mine_map_id=game.mine_map, row_num=x, col_num=y).first()
+    value = mine_data.value
+
+    # If the cell contains a mine, it's game over
+    if value is const.MineMapDataValue.MINE:
+        # Update game state
+        game.state = const.GameState.LOSE
+        DBSession.add(game)
+        DBSession.flush()
+    else:
+        # TODO: how to cascade reveal
+        if value is const.MineMapDataValue.CLUE[0]:
+            # Cascade reveal.
+            pass
+            # For each adjacent cell, store the coordinates and the value
+            # contained in the MineMap
+    # TODO: How to check for winning condition after a cascade or reveal
+    # that isn't a mine
+    # if, after all the reveal click records are noted, the click map
+    # matches the winning map (mine_matrix * 0.1)', then the game is won
+
+
+def right_click(x, y, game):
+    # Set/increment/clear the flag in this cell
+    flag_map = DBSession.query(models.PlayerMap).filter_by(
+        game_id=game.id, map_type=const.PlayerMapType.FLAG).first()
+    # Check to see if there's a flag set for this cell
+    flag_data = DBSession.query(models.PlayerMapData).filter_by(
+        player_map_id=flag_map.id, row_num=x, col_num=y).first()
+
+    # If there was no entry, so add flag
+    if flag_data is None:
+        recorded_flag = models.PlayerMapData(
+            player_map_id=flag_map.id, row_num=x, col_num=y,
+            value=const.PlayerMapDataValue.FLAG)
+        DBSession.add(recorded_flag)
+        value = const.PlayerMapDataValue.FLAG
+    else:
+        # There was an entry, so we either increment or delete
+        # If it was a FLAG, increment to an UNSURE
+        if flag_data.value == const.PlayerMapDataValue.FLAG:
+            value = const.PlayerMapDataValue.UNSURE
+            flag_data.value = value
+            DBSession.add(flag_data)
+        else:
+            # If an UNSURE, delete
+            value = const.CellStates.UNCLICKED
+            raise NotImplementedError('DELETE HERE')

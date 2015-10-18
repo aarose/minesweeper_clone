@@ -60,3 +60,12 @@ class MineMapDataValue(object):
     @classmethod
     def choices(cls):
         return cls.CLUE + [cls.MINE]
+
+
+class Action(object):
+    LEFT_CLICK = 1
+    RIGHT_CLICK = 3
+
+    @classmethod
+    def choices(cls):
+        return [cls.LEFT_CLICK, cls.RIGHT_CLICK]

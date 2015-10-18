@@ -88,7 +88,6 @@ class PlayerMap(ModelBase):
                 entry.value == filter_for]
 
 
-
 class PlayerMapData(ModelBase):
     """ Maps a value to a row and column in a Map. """
     __tablename__ = 'player_map_data'

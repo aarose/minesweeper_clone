@@ -195,11 +195,20 @@ class MineMatrix(Matrix):
 
 
 def multiply(m1, m2):
-    """ Multiply two Matrices, by element. """
+    """ Multiply two Matrices, by element. Ensures results are Integers. """
     if m1.height != m2.height or m1.width != m2.width:
         raise Exception('Matrices are not equal in size')
     m3 = Matrix(m1.height, width=m1.width, init_value=None)
     for x in range(m1.height):
         for y in range(m2.width):
-            m3[x][y] = m1[x][y] * m2[x][y]
+            m3[x][y] = int(m1[x][y] * m2[x][y])
     return m3
+
+
+def bit_flip(matrix):
+    """ Elements must be either 0 or 1. Returns the complementary matrix. """
+    inverted_matrix = Matrix(matrix.height, width=matrix.width)
+    for x in range(matrix.height):
+        for y in range(matrix.width):
+            inverted_matrix[x][y] = 1 - matrix[x][y]
+    return inverted_matrix
