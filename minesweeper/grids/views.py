@@ -198,7 +198,7 @@ def left_click(x, y, click_map, game):
 
     # If a blank space got revealed, time for a cascade reveal
     if value is const.MineMapDataValue.CLUE[0]:
-        reveal = cascade_reveal(x, y, mine_map, click_map.id)
+        reveal = cascade_reveal(x, y, mine_matrix, click_map.id)
     DBSession.flush()
 
     # Compare the Click matrix to the Win matrix. If the same, the game is won
@@ -258,19 +258,29 @@ def cascade_reveal(start_x, start_y, mine_matrix, click_map_id):
         (focus_x, focus_y) = blank_spaces.pop()
         for x in Matrix._adjacent_indices(focus_x, placeholder.height-1):
             for y in Matrix._adjacent_indices(focus_y, placeholder.width-1):
-                # If there isn't an entry in the placeholder for this cell,
-                # we haven't "revealed" this yet.
-                if (x, y) != (focus_x, focus_y) and placeholder[x][y] is None:
-                    value = mine_matrix[x][y]
-                    reveal.append({'x': x, 'y': y, 'value': value})
-                    placeholder[x][y] = value
+
+                # Have we already seen this entry?
+                if (x, y) == (focus_x, focus_y) or placeholder[x][y] is not None:
+                    continue  # skip this entry
+
+                value = mine_matrix[x][y]
+                # We haven't come across this entry yet, but it still may
+                # already be clicked
+                placeholder[x][y] = value
+
+                # Check if there's a ClickMap entry for this datapoint
+                click = DBSession.query(models.PlayerMapData).filter_by(
+                    player_map_id=click_map_id, row_num=x, col_num=y).first()
+                if click is None:
                     # Save a ClickMap entry for this cell
                     recorded_click = models.PlayerMapData(
                         player_map_id=click_map_id, row_num=x, col_num=y,
                         value=const.PlayerMapDataValue.CLICKED)
                     DBSession.add(recorded_click)
-                    # If the value is another blank space, save to look later
-                    if value is const.CellStates.CLUE[0]:
-                        blank_spaces.append((x, y))
+                    reveal.append({'x': x, 'y': y, 'value': value})
+
+                # If the value is another blank space, save to look later
+                if value is const.CellStates.CLUE[0]:
+                    blank_spaces.append((x, y))
 
     return reveal
