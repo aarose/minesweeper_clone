@@ -20,7 +20,7 @@ class Game(ModelBase):
     state = db.Column(db.Integer, default=const.GameState.IN_PROGRESS,
                       nullable=False)
     player_maps = orm.relationship("PlayerMap", order_by="PlayerMap.map_type")
-    mine_map = foreign_key_column(None, db.Integer, "mine_map.id")
+    mine_map = foreign_key_column(None, db.Integer, "mine_maps.id")
 
     __table_args__ = (
         db.CheckConstraint(state in const.GameState.choices(),
