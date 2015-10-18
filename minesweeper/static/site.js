@@ -52,11 +52,13 @@ $(function(){
         var cell_path = path + '/cell/' + x + ',' + y;
         var cell_id = get_cell_id(x, y);
         var flag_id = '#f' + x + y;
+        var fresh = $(cell_id).hasClass('fresh')
 
         // LEFT CLICK
         if(event.which == 1){
             // Not allowed to left-click if flag is on there
-            if($(flag_id).length == 0) {
+            // or if already revealed (no fresh class)
+            if(($(flag_id).length == 0) && fresh) {
 
                 // Ajax request to current url + /cell/x,y, POST 
                 $.post(cell_path, {action: event.which}, function(data, statusTxt){
@@ -80,20 +82,23 @@ $(function(){
                  });
             }
         } else if(event.which == 3) {  //RIGHT CLICK
-            $.post(cell_path, {action: event.which}, function(data, statusTxt){
-                if(statusTxt == "success"){
-                    if(data.value == 11) {  // FLAG
-                        $(cell_id).append("<i id='f" + x + y + "' class='fa fa-flag'></i>");
-                    } else if(data.value == 12) { // UNSURE
-                        $(flag_id).remove();
-                        $(cell_id).append("<i id='f" + x + y + "' class='fa fa-question'></i>");
-                    } else if(data.value == 0) {  // CLEAR
-                        $(flag_id).remove();
+            // Don't POST if the square is already revealed
+            if(fresh){
+                $.post(cell_path, {action: event.which}, function(data, statusTxt){
+                    if(statusTxt == "success"){
+                        if(data.value == 11) {  // FLAG
+                            $(cell_id).append("<i id='f" + x + y + "' class='fa fa-flag'></i>");
+                        } else if(data.value == 12) { // UNSURE
+                            $(flag_id).remove();
+                            $(cell_id).append("<i id='f" + x + y + "' class='fa fa-question'></i>");
+                        } else if(data.value == 0) {  // CLEAR
+                            $(flag_id).remove();
+                        }
                     }
-                }
-                if(statusTxt == "error")
-                    console.log("Error: " + statusTxt);
-            });
+                    if(statusTxt == "error")
+                        console.log("Error: " + statusTxt);
+                });
+            }
         }
     });
 });
