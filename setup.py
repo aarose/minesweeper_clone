@@ -8,7 +8,7 @@ with open(os.path.join(here, 'README.rst')) as f:
 
 requires = [
     'pyramid',
-    'pyramid_chameleon',
+    'pyramid_mako',
     'pyramid_tm',
     'SQLAlchemy',
     'transaction',

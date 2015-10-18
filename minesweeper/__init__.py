@@ -17,10 +17,9 @@ def main(global_config, **settings):
 
     # Configure
     config = Configurator(settings=settings)
-    config.include('pyramid_chameleon')
+    config.include('pyramid_mako')
     for route in routes:
         config.add_route(route.name, route.url)
-        config.add_view(route.view, route_name=route.name)
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.scan()
     return config.make_wsgi_app()

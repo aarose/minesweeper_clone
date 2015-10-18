@@ -1,18 +1,11 @@
 #!/usr/bin/python
 from collections import namedtuple
 
-from minesweeper.grids.views import (
-    CellView,
-    GridCreateView,
-    GridDetailView,
-    home,
-)
-
-Route = namedtuple('Route', ['name', 'url', 'view'])
+Route = namedtuple('Route', ['name', 'url'])
 
 routes = [
-    Route(name='home', url='/', view=home),
-    Route(name='grid_create', url='/grid', view=GridCreateView),
-    Route(name='grid_get', url='/grid/{grid_id}', view=GridDetailView),
-    Route(name='cell', url='/grid/{grid_id}/cell/{x},{y}', view=CellView),
+    Route(name='home', url='/'),
+    Route(name='game_create', url='/grid'),
+    Route(name='game_get', url='/grid/{grid_id}'),
+    Route(name='cell_get', url='/grid/{grid_id}/cell/{x},{y}'),
 ]
