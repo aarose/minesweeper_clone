@@ -21,7 +21,7 @@
                 % endif
                     % if (value-1) > 0:
                         % if value == 10:
-                            <i class="fa fa-bomb"></i>
+                            <i class="fa fa-bomb red"></i>
                         % else:
                             ${value-1}
                         % endif
