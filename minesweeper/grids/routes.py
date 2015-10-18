@@ -5,7 +5,7 @@ Route = namedtuple('Route', ['name', 'url'])
 
 routes = [
     Route(name='home', url='/'),
-    Route(name='game_create', url='/grid'),
-    Route(name='game_get', url='/grid/{grid_id}'),
-    Route(name='cell_get', url='/grid/{grid_id}/cell/{x},{y}'),
+    Route(name='create_game', url='/game'),
+    Route(name='view_game', url='/game/{game_id}'),
+    Route(name='cell_get', url='/game/{game_id}/cell/{x},{y}'),
 ]
