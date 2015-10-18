@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import random
 
+import transaction
+
 from minesweeper.models_base import DBSession
 import minesweeper.grids.constants as const
 from minesweeper.grids.models import (
@@ -81,7 +83,7 @@ class Matrix(list):
 
         player_map.map_data = map_data
         DBSession.add(player_map)
-        DBSession.commit()
+        transaction.commit()
         return player_map
 
     def to_existing_model(self):
@@ -189,6 +191,4 @@ class MineMatrix(Matrix):
                     mine_data.append(new_data)
 
         mine_map.map_data = mine_data
-        DBSession.add(mine_map)
-        DBSession.commit()
         return mine_map

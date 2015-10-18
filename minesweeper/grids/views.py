@@ -1,4 +1,6 @@
 #!/usr/bin/python
+import transaction
+
 from pyramid.view import (
     view_config,
     view_defaults,
@@ -31,16 +33,17 @@ class Home(object):
                                  width=const.DEFAULT_WIDTH,
                                  mine_number=const.DEFAULT_MINES)
         mine_map = mine_matrix.to_model()
-        # Create a Game
-        game = models.Game(mine_map=mine_map)
+        DBSession.add(mine_map)
+        DBSession.flush()
+
+        # Create a Game and PlayerMaps for it
+        game = models.Game(mine_map=mine_map.id)
         game.player_maps = [
             models.PlayerMap(map_type=const.PlayerMapType.CLICK),
             models.PlayerMap(map_type=const.PlayerMapType.FLAG),
         ]
         DBSession.add(game)
-        DBSession.commit()
-        # No point in initalizing the matrix - it's empty anyway
-        # But we still need to save a PlayerMap for type CLICK and FLAG
+        DBSession.flush()
         return HTTPFound(location=self.request.route_url('view_game',
                                                          game_id=game.id))
 

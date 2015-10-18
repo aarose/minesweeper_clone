@@ -20,37 +20,19 @@ class Game(ModelBase):
     id = db.Column(db.Integer, primary_key=True)
     state = db.Column(db.Integer, default=const.GameState.IN_PROGRESS,
                       nullable=False)
-    player_maps = orm.relationship("PlayerMap", backref='game_id',
+    player_maps = orm.relationship("PlayerMap", backref='player_maps',
                                    order_by="PlayerMap.map_type")
     mine_map = foreign_key_column(None, db.Integer, "mine_maps.id")
-
-    __table_args__ = (
-        db.CheckConstraint(state in const.GameState.choices(),
-                           name='check_state'),
-        {})
 
 
 class MineMap(ModelBase):
     """ MineMap model. """
     __tablename__ = 'mine_maps'
     id = db.Column(db.Integer, primary_key=True)
-    map_data = orm.relationship("MineMapData", backref="map_id",
+    map_data = orm.relationship("MineMapData", backref="map_data",
                                 order_by="MineMapData.row_num")
     height = db.Column(db.Integer, nullable=False)
     width = db.Column(db.Integer, nullable=False)
-
-    def __init__(self, height=const.MIN_HEIGHT,
-                 width=const.MIN_WIDTH, **kwargs):
-        super(MineMap, self).__init__(**kwargs)
-
-    def _validate_init(self, height, width):
-        """ Validates input for init. """
-        if const.MIN_HEIGHT > height > const.MAX_HEIGHT:
-            raise InvalidGrid('Height must be between %s and %s' %
-                              (const.MIN_HEIGHT, const.MAX_HEIGHT))
-        if const.MIN_WIDTH > width > const.MAX_WIDTH:
-            raise InvalidGrid('Width must be between %s and %s' %
-                              (const.MIN_WIDTH, const.MAX_WIDTH))
 
     def to_matrix(self):
         from minesweeper.grids.matrices import MineMatrix
@@ -65,12 +47,12 @@ class MineMapData(ModelBase):
     """ A Mine's position in a MineMap. """
     __tablename__ = 'mine_map_data'
 
-    map_id = foreign_key_column(None, db.Integer, "mine_maps.id")
+    mine_map_id = foreign_key_column(None, db.Integer, "mine_maps.id")
     row_num = db.Column(db.Integer, nullable=False)
     col_num = db.Column(db.Integer, nullable=False)
 
     __table_args__ = (
-        db.PrimaryKeyConstraint('map_id', 'row_num', 'col_num'),
+        db.PrimaryKeyConstraint('mine_map_id', 'row_num', 'col_num'),
         db.CheckConstraint(row_num >= 0, name='check_row_num_positive'),
         db.CheckConstraint(col_num >= 0, name='check_col_num_positive'),
         {})
@@ -83,15 +65,11 @@ class PlayerMap(ModelBase):
     id = db.Column(db.Integer, primary_key=True)
     game_id = foreign_key_column(None, db.Integer, "games.id")
     map_type = db.Column(db.Text, nullable=False)
-    map_data = orm.relationship("PlayerMapData", backref="map_id",
+    map_data = orm.relationship("PlayerMapData", backref="map_data",
                                 order_by="PlayerMapData.row_num")
+    games = orm.relationship("Game", backref="games")
 
-    __table_args__ = (
-        db.CheckConstraint(
-            map_type in const.PlayerMapType.choices(),
-            name='restrict_map_type'),
-        db.UniqueConstraint(game_id, map_type),
-        )
+    __table_args__ = (db.UniqueConstraint(game_id, map_type), )
 
     def to_matrix(self):
         from minesweeper.grids.matrices import Matrix
@@ -111,15 +89,13 @@ class PlayerMapData(ModelBase):
     """ Maps a value to a row and column in a Map. """
     __tablename__ = 'player_map_data'
 
-    map_id = foreign_key_column(None, db.Integer, "player_maps.id")
+    player_map_id = foreign_key_column(None, db.Integer, "player_maps.id")
     row_num = db.Column(db.Integer, nullable=False)
     col_num = db.Column(db.Integer, nullable=False)
     value = db.Column(db.Integer, nullable=False)
 
     __table_args__ = (
-        db.PrimaryKeyConstraint('map_id', 'row_num', 'col_num'),
+        db.PrimaryKeyConstraint('player_map_id', 'row_num', 'col_num'),
         db.CheckConstraint(row_num >= 0, name='check_row_num_positive'),
         db.CheckConstraint(col_num >= 0, name='check_col_num_positive'),
-        db.CheckConstraint(value in const.PlayerMapDataValue.choices(),
-                           name='check_value'),
-        {})
+        )
