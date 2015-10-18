@@ -1,7 +1,12 @@
 #!/usr/bin/python
 import random
 
+from minesweeper.models_base import DBSession
 import minesweeper.grids.constants as const
+from minesweeper.grids.models import (
+    MineMap,
+    MineMapData,
+    )
 
 
 class CellStates(object):
@@ -62,9 +67,9 @@ class InvalidMineAmount(Exception):
     """ Raised when mine limit exceeded. """
 
 
-class MineMap(Matrix):
+class MineMatrix(Matrix):
     def __init__(self, mine_number, height, width=None,
-                 mine_value=CellStates.MINE, **kwargs):
+                 mine_value=CellStates.MINE, fill=False, **kwargs):
         """
         Creates a Matrix and places mines and clues in it.
 
@@ -75,14 +80,17 @@ class MineMap(Matrix):
                 not set, defaults to be the same as the height.
             mine_value(int, optional): The value that represents a mine.
                 Defaults to CellStates.MINE.
+            fill (bool, optional): If True, randomly places mines, and sets
+                clues around them. Defaults to False.
         """
-        super(MineMap, self).__init__(height, width=width, **kwargs)
+        super(MineMatrix, self).__init__(height, width=width, **kwargs)
         # Ensure that the number of mines doesn't exceed the number of spaces
         max_mines = int(self.height * self.width * const.MAX_MINE_AREA)
         if mine_number > max_mines:
             raise InvalidMineAmount('%s exceeds the current mine limit of %s'
                                     % (mine_number, max_mines))
-        self._place_mines(mine_number, mine_value)
+        if fill:
+            self._randomly_place_mines(mine_number, mine_value)
 
     def _random_coord(self):
         """ Returns random x and y coordinates for this matrix. """
@@ -90,7 +98,7 @@ class MineMap(Matrix):
         y = random.randint(0, (self.width - 1))
         return (x, y)
 
-    def _increment_surrounding(self, focus_x, focus_y, mine_value):
+    def increment_surrounding(self, focus_x, focus_y, mine_value):
         """
         Increments cells around the given position by 1, if they're not mines.
 
@@ -104,7 +112,7 @@ class MineMap(Matrix):
                 if (x, y) != (focus_x, focus_y) and self[x][y] != mine_value:
                     self[x][y] += 1
 
-    def _place_mines(self, mine_number, mine_value):
+    def _randomly_place_mines(self, mine_number, mine_value):
         """ Places mines randomly in the matrix, and set clues around them. """
         for i in range(mine_number):
             placed = False
@@ -114,5 +122,21 @@ class MineMap(Matrix):
                 # Ensure no mine was already placed there. Overwrite clues.
                 if self[mine_x][mine_y] != mine_value:
                     self[mine_x][mine_y] = mine_value
-                    self._increment_surrounding(mine_x, mine_y, mine_value)
+                    self.increment_surrounding(mine_x, mine_y, mine_value)
                     placed = True
+
+    def to_model(self):
+        """ Converts contents into MineMapData and a MineMap. """
+        # Each entry should be a row in the MineMapData table
+        mine_map = MineMap()
+
+        mine_data = []
+        for i in range(self.height):
+            for j in range(self.width):
+                new_data = MineMapData(row_num=i, col_num=j, value=self[i][j])
+                mine_data.append(new_data)
+
+        mine_map.map_data = mine_data
+        DBSession.add(mine_map)
+        DBSession.commit()
+        return mine_map
