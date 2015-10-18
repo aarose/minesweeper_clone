@@ -18,5 +18,9 @@
         </tbody>
     </table>
 % else:
-    Loading...
+    <form class="pure-form" action='/' method="POST">
+        <button type="submit" class="pure-button button-primary">
+            New Game
+        </button>
+    </form>
 % endif
