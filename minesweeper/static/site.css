@@ -37,6 +37,7 @@ body {
   width: 1.5em;
 }
 #mine-grid .fresh {
+  color: #ecf0f1;
   background-color: #e67e22;
 }
 #mine-grid .fresh:hover {

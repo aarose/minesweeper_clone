@@ -83,6 +83,26 @@ def view_game(request):
     return response
 
 
+@view_config(route_name='get_flags', request_method='GET', renderer='json')
+def get_flags(request):
+    game = get_game_or_none(request)
+    if game is None:
+        return HTTPNotFound('No such game.')
+
+    # Get the FlagMap
+    flag_map = DBSession.query(models.PlayerMap).filter_by(
+        game_id=game.id, map_type=const.PlayerMapType.FLAG).first()
+    # Each entry is either a flag, or a question
+    flag_entries = DBSession.query(models.PlayerMapData).filter_by(
+        player_map_id=flag_map.id, value=const.PlayerMapDataValue.FLAG).all()
+    unsure_entries = DBSession.query(models.PlayerMapData).filter_by(
+        player_map_id=flag_map.id, value=const.PlayerMapDataValue.UNSURE).all()
+
+    flags = [[flag.row_num, flag.col_num] for flag in flag_entries]
+    unsures = [[unsure.row_num, unsure.col_num] for unsure in unsure_entries]
+    return {'flags': flags, 'unsures': unsures}
+
+
 @view_config(route_name='cell_get', request_method='POST', renderer='json')
 def update_cell(request):
     """ Executes the provided action upon the cell, returns the state. """
