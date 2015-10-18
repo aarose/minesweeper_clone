@@ -5,7 +5,7 @@ Minesweeper
 
     python setup.py test -q
 
-    initialize_tutorial_db development.ini
+    initialize_test1_db development.ini
 
     pserve development.ini --reload
 
