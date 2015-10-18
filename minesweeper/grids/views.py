@@ -1,6 +1,4 @@
 #!/usr/bin/python
-import transaction
-
 from pyramid.view import (
     view_config,
     view_defaults,
@@ -12,7 +10,10 @@ from pyramid.httpexceptions import (
 
 from minesweeper.grids import constants as const
 from minesweeper.grids import models
-from minesweeper.grids.matrices import MineMatrix
+from minesweeper.grids.matrices import (
+    MineMatrix,
+    multiply,
+    )
 from minesweeper.models_base import DBSession
 
 
@@ -57,15 +58,24 @@ def view_game(request):
     if game is None:
         return HTTPNotFound('No such game.')
 
-    # game = {'contents': [[2, 0], [12, 0]], 'state': 'in-progress'}
     mine_map = DBSession.query(models.MineMap).get(game.mine_map)
     number_of_mines = DBSession.query(models.MineMapData).filter_by(
         mine_map_id=mine_map.id).count()
+
+    # Derive the grid (mine matrix * click matrix)
+    mine_matrix = mine_map.to_matrix()
+    click_map = DBSession.query(models.PlayerMap).filter_by(
+        game_id=game.id, map_type=const.PlayerMapType.CLICK).first()
+    click_matrix = click_map.to_matrix()  # Acts as a mask
+    grid = multiply(mine_matrix, click_matrix)
+
     response = {
         'game': True,
         'height': mine_map.height,
         'width': mine_map.width,
         'mines': number_of_mines,
+        'state': game.state,
+        'grid': grid,
     }
     return response
 

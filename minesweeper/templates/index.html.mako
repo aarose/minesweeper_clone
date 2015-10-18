@@ -1,17 +1,32 @@
 <%inherit file="base.html"/>
 % if game:
-    <table class="pure-table pure-table-bordered" id="mine-grid">
+    <table class="pure-table" id="mine-grid">
         <thead>
             <tr>
-                <th colspan=${width} id="mine-count">10</th>
+                <th id="mine-count">${mines}</th>
+                <th colspan=${width-2}></th>
+                <th id="state">${state}</th>
             </tr>
         </thead>
 
         <tbody>
-            % for i in range(height):
+            % for row in grid:
             <tr>
-                % for j in range(width):
-                <td id="">${loop.parent.index},${loop.index}</td>
+                % for value in row:
+                <td id="cell-${loop.parent.index}-${loop.index}"
+                % if value == 0:
+                    class="fresh">
+                % else:
+                    >
+                % endif
+                    % if (value-1) > 0:
+                        % if value == 10:
+                            <i class="fa fa-bomb"></i>
+                        % else:
+                            ${value-1}
+                        % endif
+                    % endif
+                </td>
                 % endfor
             </tr>
             % endfor

@@ -73,16 +73,20 @@ class PlayerMap(ModelBase):
 
     def to_matrix(self):
         from minesweeper.grids.matrices import Matrix
-        # TODO: Does this work?
-        height = DBSession.query(MineMap.height).join(Game).filter_by(
-            game_id=self.game_id)
-        width = DBSession.query(MineMap.width).join(Game).filter_by(
-            game_id=self.game_id)
-        matrix = Matrix(height, width)
+        mine_map = DBSession.query(MineMap).join(Game).filter_by(
+            id=self.game_id).first()
+        matrix = Matrix(mine_map.height, mine_map.width)
         for entry in self.map_data:
             # Each entry has a value that needs to be inserted into the matrix
             matrix[entry.row_num][entry.col_num] = entry.value
         return matrix
+
+    def to_list(self, filter_for=None):
+        if filter_for is None:
+            return [(entry.row_num, entry.col_num) for entry in self.map_data]
+        return [(entry.row_num, entry.col_num) for entry in self.map_data if
+                entry.value == filter_for]
+
 
 
 class PlayerMapData(ModelBase):

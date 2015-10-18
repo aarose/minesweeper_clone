@@ -110,7 +110,7 @@ class MineMatrix(Matrix):
             mine_value (int, optional): The value that represents a mine.
                 Defaults to CellStates.MINE.
         """
-        super(MineMatrix, self).__init__(height, width=width, **kwargs)
+        super(MineMatrix, self).__init__(height, width=width, init_value=1)
         self.mine_value = mine_value
         self.mine_count = 0
         if mine_number is not None:
@@ -192,3 +192,14 @@ class MineMatrix(Matrix):
 
         mine_map.map_data = mine_data
         return mine_map
+
+
+def multiply(m1, m2):
+    """ Multiply two Matrices, by element. """
+    if m1.height != m2.height or m1.width != m2.width:
+        raise Exception('Matrices are not equal in size')
+    m3 = Matrix(m1.height, width=m1.width, init_value=None)
+    for x in range(m1.height):
+        for y in range(m2.width):
+            m3[x][y] = m1[x][y] * m2[x][y]
+    return m3
