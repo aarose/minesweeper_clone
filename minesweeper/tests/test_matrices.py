@@ -1,6 +1,6 @@
 import unittest
 
-from minesweeper.grids.utils import (
+from minesweeper.grids.matrices import (
     InvalidMineAmount,
     Matrix,
     MineMatrix,
