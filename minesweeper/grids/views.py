@@ -130,7 +130,10 @@ def update_cell(request):
         return HTTPForbidden('The cell has alread been revealed.')
 
     # Validate action
-    action = request.POST.get('action')
+    try:
+        action = int(request.POST.get('action'))
+    except ValueError:
+        return HTTPBadRequest('Action must be an integer')
     if action not in const.Action.choices():
         return HTTPBadRequest('That action is incorrect.')
 
@@ -145,7 +148,7 @@ def update_cell(request):
 
 
 def get_game_or_none(request):
-    game_id = request.matchdict['game_id']
+    game_id = int(request.matchdict['game_id'])
     game = DBSession.query(models.Game).get(game_id)
     return game
 
