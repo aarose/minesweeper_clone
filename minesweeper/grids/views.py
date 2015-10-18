@@ -184,10 +184,9 @@ def left_click(x, y, click_map, game):
         value=const.PlayerMapDataValue.CLICKED)
     DBSession.add(recorded_click)
 
-    # mine_data = DBSession.query(models.MineMapData).filter_by(
-    #     mine_map_id=game.mine_map, row_num=x, col_num=y).first()
-    # value = mine_data.value
-    value = get_cell_mine_map_value(x, y, game)
+    mine_map = DBSession.query(models.MineMap).get(game.mine_map)
+    mine_matrix = mine_map.to_matrix()
+    value = mine_matrix[x][y]
 
     # If the cell contains a mine, game over
     if value is const.MineMapDataValue.MINE:
@@ -197,12 +196,9 @@ def left_click(x, y, click_map, game):
         DBSession.flush()
         return (value, reveal, game)
 
-    # If a clicked, blank space got revealed, time for a cascade reveal
+    # If a blank space got revealed, time for a cascade reveal
     if value is const.MineMapDataValue.CLUE[0]:
-        # TODO: Cascade reveal.
-        pass
-        # For each adjacent cell, store the coordinates and the value
-        # contained in the MineMap
+        reveal = cascade_reveal(x, y, mine_map)
     DBSession.flush()
 
     # Compare the Click matrix to the Win matrix. If the same, the game is won
@@ -246,3 +242,32 @@ def right_click(x, y, game):
             DBSession.delete(flag_data)
             DBSession.flush()
     return (value, game)
+
+
+def cascade_reveal(start_x, start_y, mine_matrix):
+    """ Returns the list of dicts, representing the values to reveal. """
+    # Where the revealed values go. The position records the x, y coordinates
+    # Faster lookup than using the reveal list of dicts
+    placeholder = Matrix(mine_matrix.height, width=mine_matrix.width,
+                         init_value=None)
+    blank_spaces = [(start_x, start_y)]  # queue of spaces to explore
+    reveal = []
+
+    # Look around each blank space
+    while(blank_spaces):
+        (focus_x, focus_y) = blank_spaces.pop()
+        for x in Matrix._adjacent_indices(focus_x, placeholder.height-1):
+            for y in Matrix._adjacent_indices(focus_y, placeholder.width-1):
+                # If there isn't an entry in the placeholder for this cell,
+                # we haven't "revealed" this yet.
+                if (x, y) != (focus_x, focus_y) and placeholder[x][y] is None:
+                    value = mine_matrix[x][y]
+                    reveal.append({'x': x, 'y': y, 'value': value})
+                    placeholder[x][y] = value
+                    # Save a ClickMap entry for this cell
+                    # TODO: save
+                    # If the value is another blank space, save to look later
+                    if value is const.CellStates.CLUE[0]:
+                        blank_spaces.append((x, y))
+
+    return reveal
