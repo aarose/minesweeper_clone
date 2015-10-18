@@ -80,9 +80,10 @@ def view_game(request):
     return response
 
 
+"""
 @view_config(route_name='cell_get', request_method='GET', renderer='json')
 def get(request):
-    """ Returns the value of the cell in the grid, and the game state. """
+    "" Returns the value of the cell in the grid, and the game state. ""
     # grid_id = self.request.matchdict[grid_id]
     # cell_x = self.request.matchdict['x']
     # cell_y = self.request.matchdict['y']
@@ -90,10 +91,36 @@ def get(request):
     # Multiply the minemap by the clickmap to get the states, add the
     cell = {'value': 0, 'state': 'in-progress'}
     return cell
+"""
 
 
-@view_config(route_name='cell_get', request_method='PUT', renderer='json')
-def put(request):
+@view_config(route_name='cell_get', request_method='POST', renderer='json')
+def update_cell(request):
     """ Executes the provided action upon the cell, returns the state. """
-    cell = {'value': 2, 'state': 'win'}
-    return cell
+    game_id = request.matchdict['game_id']
+    game = DBSession.query(models.Game).get(game_id)
+    if game is None:
+        return HTTPNotFound('No such game.')
+
+    x = request.matchdict['x']
+    y = request.matchdict['y']
+
+    # TODO: How to get the post data being sent in?
+
+    # If the game is not in progress (won or lost) then can't do any action
+    # raise 403 Forbidden
+
+    # If the action is a Left Click, then it's trying to reveal what is avail.
+    # so add entry to click map data, for next time loading, and get the
+    # MineMapData.value at x row_num and y col_num
+
+    # If the action is a right click, update the flag data OR delete the entry
+    # if it got reset back to 0 (no flag, no ?)
+    # Can only right click on squares that haven't been releaved yet (grid
+    # gives back a 0)
+    response = {
+        'state': game.state,
+        'value': 2,
+        'state': 'win',
+    }
+    return response
