@@ -53,7 +53,7 @@ class Home(object):
                                                          game_id=game.id))
 
 
-@view_config(route_name='view_game', request_method='GET', http_cache=3600,
+@view_config(route_name='view_game', request_method='GET',
              renderer=const.MAIN_TEMPLATE)
 def view_game(request):
     """ Returns the game. """

@@ -1,16 +1,6 @@
 $(function(){
     var path = window.location.pathname;
 
-    var success_update = function(data) {
-        if(data.state != 0) {
-            location.reload(true);
-        } else {
-            // Remove the 'fresh' class from this element
-            // Update the text for this element
-            console.log($(this));
-        }
-    }
-
     $("td").mousedown(function(event){
         // Get the coordinates
         var coords = $(this).attr('id')
@@ -24,8 +14,18 @@ $(function(){
         // Ajax request to current url + /cell/x,y, POST 
         $.post(cell_path, {action: event.which}, function(data, statusTxt){
             if(statusTxt == "success"){
-                console.log("External content loaded successfully!");
-                success_update(data);
+                if(data.state != 0) {
+                    location.reload(true);
+                } else {
+                    // Remove the 'fresh' class from the cell
+                    var cell_id = '#cell-' + x + '-' + y;
+                    $(cell_id).removeAttr('class');
+                    // Update the text for this element
+                    var new_value = data.value -1;
+                    if(new_value!=0) {
+                        $(cell_id).text(data.value-1);
+                    }
+                };
             }
             if(statusTxt == "error")
                 console.log("Error: " + statusTxt);

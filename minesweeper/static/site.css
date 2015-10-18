@@ -8,6 +8,11 @@ body {
   color: #e74c3c;
 }
 
+.safe {
+  color: #526652;
+  background-color: #95a5a6;
+}
+
 /* BTNS */
 .pure-button {
   font-size: 110%;
