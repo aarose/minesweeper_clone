@@ -13,6 +13,10 @@ body {
   background-color: #95a5a6;
 }
 
+footer p{
+  color: #34495e;
+}
+
 /* BTNS */
 .pure-button {
   font-size: 110%;
