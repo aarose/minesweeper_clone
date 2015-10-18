@@ -1,22 +1,22 @@
 <%inherit file="base.html"/>
-<table class="pure-table">
-    <thead>
-        <tr>
-            <th colspan=9 id="mine_count">10</th>
-        </tr>
-    </thead>
+% if game:
+    <table class="pure-table pure-table-bordered" id="mine-grid">
+        <thead>
+            <tr>
+                <th colspan=${width} id="mine-count">10</th>
+            </tr>
+        </thead>
 
-    <tbody>
-        <tr>
-            <td id="">x</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-        </tr>
-    </tbody>
-</table>
+        <tbody>
+            % for i in range(height):
+            <tr>
+                % for j in range(width):
+                <td id="">${loop.parent.index},${loop.index}</td>
+                % endfor
+            </tr>
+            % endfor
+        </tbody>
+    </table>
+% else:
+    Loading...
+% endif
