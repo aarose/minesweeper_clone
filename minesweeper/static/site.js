@@ -1,27 +1,30 @@
 $(function(){
     var path = window.location.pathname;
 
-    // Draw in pre-existing flags and "unsures"
-    var flag_path = path + '/flags';
-    $.get(flag_path, function(data, statusTxt){
-        if(statusTxt == "success"){
-            for(i = 0; i < data.flags.length; i++) {
-                var coords = data.flags[i];
-                var flag_id = 'f' + coords[0] + coords[1];
-                var cell_id = '#cell-' + coords[0] + '-' + coords[1];
-                $(cell_id).append("<i id='" + flag_id + "' class='fa fa-flag'></i>");
+    // Draw in pre-existing flags and "unsures" IF the game is still going
+    var state = $('#state').attr('state')
+    if(state == 0){
+        var flag_path = path + '/flags';
+        $.get(flag_path, function(data, statusTxt){
+            if(statusTxt == "success"){
+                for(i = 0; i < data.flags.length; i++) {
+                    var coords = data.flags[i];
+                    var flag_id = 'f' + coords[0] + coords[1];
+                    var cell_id = '#cell-' + coords[0] + '-' + coords[1];
+                    $(cell_id).append("<i id='" + flag_id + "' class='fa fa-flag'></i>");
+                }
+                for(i = 0; i < data.unsures.length; i++) {
+                    var coords = data.unsures[i];
+                    var flag_id = 'f' + coords[0] + coords[1];
+                    var cell_id = '#cell-' + coords[0] + '-' + coords[1];
+                    $(cell_id).append("<i id='" + flag_id + "' class='fa fa-question'></i>");
+                }
+     
+            } else {
+                console.log(statusTxt);
             }
-            for(i = 0; i < data.unsures.length; i++) {
-                var coords = data.unsures[i];
-                var flag_id = 'f' + coords[0] + coords[1];
-                var cell_id = '#cell-' + coords[0] + '-' + coords[1];
-                $(cell_id).append("<i id='" + flag_id + "' class='fa fa-question'></i>");
-            }
- 
-        } else {
-            console.log(statusTxt);
-        }
-    });
+        });
+    }
 
 
     $("td").mousedown(function(event){

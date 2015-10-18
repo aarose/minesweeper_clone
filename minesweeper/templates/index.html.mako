@@ -11,7 +11,7 @@
                         <i class="fa fa-frown-o"></i>
                     % endif
                 </th>
-                <th colspan=2 id="state">
+                <th colspan=2 id="state" state="${state}">
                     % if state is 0:
                         IN PROGRESS
                     % elif state is 1:
