@@ -1,6 +1,15 @@
 $(function(){
     var path = window.location.pathname;
-    console.log('CURRENT PATH: ' + path)
+
+    var success_update = function(data) {
+        if(data.state != 0) {
+            location.reload(true);
+        } else {
+            // Remove the 'fresh' class from this element
+            // Update the text for this element
+            console.log($(this));
+        }
+    }
 
     $("td").mousedown(function(event){
         // Get the coordinates
@@ -16,10 +25,10 @@ $(function(){
         $.post(cell_path, {action: event.which}, function(data, statusTxt){
             if(statusTxt == "success"){
                 console.log("External content loaded successfully!");
-                console.log(data);
+                success_update(data);
             }
             if(statusTxt == "error")
-                console.log("Error: " + xhr.status + ": " + xhr.statusText);
+                console.log("Error: " + statusTxt);
          });
     });
 });

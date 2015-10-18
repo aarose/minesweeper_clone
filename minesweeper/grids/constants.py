@@ -63,8 +63,8 @@ class MineMapDataValue(object):
 
 
 class Action(object):
-    LEFT_CLICK = 1
-    RIGHT_CLICK = 3
+    LEFT_CLICK = '1'
+    RIGHT_CLICK = '3'
 
     @classmethod
     def choices(cls):

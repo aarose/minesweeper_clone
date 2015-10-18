@@ -5,7 +5,15 @@
             <tr>
                 <th colspan=2 id="mine-count">Mines: ${mines}</th>
                 <th colspan=${width-4}></th>
-                <th colspan=2 id="state">Score: ${state}</th>
+                <th colspan=2 id="state">
+                    % if state is 0:
+                        IN PROGRESS
+                    % elif state is 1:
+                        YOU WIN!
+                    % elif state is -1:
+                        GAME OVER
+                    % endif
+                </th>
             </tr>
         </thead>
 
