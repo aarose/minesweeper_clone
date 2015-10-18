@@ -3,9 +3,9 @@
     <table class="pure-table" id="mine-grid">
         <thead>
             <tr>
-                <th id="mine-count">Mines: ${mines}</th>
-                <th colspan=${width-2}></th>
-                <th id="state">Score: ${state}</th>
+                <th colspan=2 id="mine-count">Mines: ${mines}</th>
+                <th colspan=${width-4}></th>
+                <th colspan=2 id="state">Score: ${state}</th>
             </tr>
         </thead>
 
