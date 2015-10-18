@@ -58,7 +58,16 @@ def view_game(request):
         return HTTPNotFound('No such game.')
 
     # game = {'contents': [[2, 0], [12, 0]], 'state': 'in-progress'}
-    return {'game': True, 'height': 2, 'width': 3}
+    mine_map = DBSession.query(models.MineMap).get(game.mine_map)
+    number_of_mines = DBSession.query(models.MineMapData).filter_by(
+        mine_map_id=mine_map.id).count()
+    response = {
+        'game': True,
+        'height': mine_map.height,
+        'width': mine_map.width,
+        'mines': number_of_mines,
+    }
+    return response
 
 
 @view_config(route_name='cell_get', request_method='GET', renderer='json')
