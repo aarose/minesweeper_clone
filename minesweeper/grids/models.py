@@ -19,7 +19,7 @@ class Game(ModelBase):
     id = db.Column(db.Integer, primary_key=True)
     state = db.Column(db.Integer, default=const.GameState.IN_PROGRESS,
                       nullable=False)
-    player_maps = orm.relationship("PlayerMap", order_by="PlayerMap.type")
+    player_maps = orm.relationship("PlayerMap", order_by="PlayerMap.map_type")
     mine_map = foreign_key_column(None, db.Integer, "mine_map.id")
 
     __table_args__ = (
@@ -59,9 +59,8 @@ class MineMap(ModelBase):
     """ MineMap model. """
     __tablename__ = 'mine_maps'
     id = db.Column(db.Integer, primary_key=True)
-    games = orm.relationship("Game")
     map_data = orm.relationship("MineMapData", backref="mine_maps",
-                                order_by="MineMapData.rowNum")
+                                order_by="MineMapData.row_num")
 
 
 class MineMapData(ModelBase):
@@ -89,7 +88,7 @@ class PlayerMap(ModelBase):
     game_id = foreign_key_column(None, db.Integer, "games.id")
     map_type = db.Column(db.Text, nullable=False)
     map_data = orm.relationship("PlayerMapData", backref="player_maps",
-                                order_by="PlayerMapData.rowNum")
+                                order_by="PlayerMapData.row_num")
 
     __table_args__ = (
         db.CheckConstraint(
