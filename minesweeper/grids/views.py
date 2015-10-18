@@ -198,7 +198,7 @@ def left_click(x, y, click_map, game):
 
     # If a blank space got revealed, time for a cascade reveal
     if value is const.MineMapDataValue.CLUE[0]:
-        reveal = cascade_reveal(x, y, mine_map)
+        reveal = cascade_reveal(x, y, mine_map, click_map.id)
     DBSession.flush()
 
     # Compare the Click matrix to the Win matrix. If the same, the game is won
@@ -244,7 +244,7 @@ def right_click(x, y, game):
     return (value, game)
 
 
-def cascade_reveal(start_x, start_y, mine_matrix):
+def cascade_reveal(start_x, start_y, mine_matrix, click_map_id):
     """ Returns the list of dicts, representing the values to reveal. """
     # Where the revealed values go. The position records the x, y coordinates
     # Faster lookup than using the reveal list of dicts
@@ -265,7 +265,10 @@ def cascade_reveal(start_x, start_y, mine_matrix):
                     reveal.append({'x': x, 'y': y, 'value': value})
                     placeholder[x][y] = value
                     # Save a ClickMap entry for this cell
-                    # TODO: save
+                    recorded_click = models.PlayerMapData(
+                        player_map_id=click_map_id, row_num=x, col_num=y,
+                        value=const.PlayerMapDataValue.CLICKED)
+                    DBSession.add(recorded_click)
                     # If the value is another blank space, save to look later
                     if value is const.CellStates.CLUE[0]:
                         blank_spaces.append((x, y))
