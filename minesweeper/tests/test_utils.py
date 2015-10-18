@@ -3,7 +3,7 @@ import unittest
 from minesweeper.grids.utils import (
     InvalidMineAmount,
     Matrix,
-    MineMap,
+    MineMatrix,
     )
 
 
@@ -72,27 +72,27 @@ class TestMatrixMethods(unittest.TestCase):
         self.assertListEqual(expected, Matrix._adjacent_indices(index, limit))
 
 
-class TestMineMapMethods(unittest.TestCase):
+class TestMineMatrixMethods(unittest.TestCase):
 
     def test_init(self):
-        """ Should create a MineMap. """
+        """ Should create a MineMatrix. """
         mines, size = 1, 5
-        minemap = MineMap(mines, size)
-        self.assertTrue(minemap)
+        minematrix = MineMatrix(mines, size)
+        self.assertTrue(minematrix)
 
     def test_exceed_mine_limit(self):
         """ Should raise InvalidMineAmount if too many mines we requested. """
         size = 5  # 5x5 matrix
         mines = size*size
-        self.assertRaises(InvalidMineAmount, MineMap, mines, size)
+        self.assertRaises(InvalidMineAmount, MineMatrix, mines, size)
 
     def test_rand_coords(self):
         """ Should return coodinates that are within the limits. """
         mines, size = 1, 2
-        minemap = MineMap(mines, size)
-        (x, y) = minemap._random_coord()
-        self.assertLess(x, minemap.height)
-        self.assertLess(y, minemap.width)
+        minematrix = MineMatrix(mines, size)
+        (x, y) = minematrix._random_coord()
+        self.assertLess(x, minematrix.height)
+        self.assertLess(y, minematrix.width)
 
 
 if __name__ == '__main__':
