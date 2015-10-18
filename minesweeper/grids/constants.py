@@ -1,12 +1,26 @@
 #!/usr/bin/python
-MIN_GRID_HEIGHT = 2
-MAX_GRID_HEIGHT = 30
+MAIN_TEMPLATE = 'minesweeper:templates/index.html.mako'
 
-MIN_GRID_WIDTH = 2
-MAX_GRID_WIDTH = 30
+DEFAULT_HEIGHT = 9
+DEFAULT_WIDTH = 9
+DEFAULT_MINES = 10
+
+MIN_HEIGHT = 2
+MAX_HEIGHT = 30
+
+MIN_WIDTH = 2
+MAX_WIDTH = 30
 
 MIN_MINE_NUM = 1
 MAX_MINE_AREA = 0.7
+
+
+class CellStates(object):
+    UNCLICKED = 0
+    CLUE = [1, 2, 3, 4, 5, 6, 7, 8]
+    MINE = 10
+    FLAG = 11
+    UNSURE = 12
 
 
 class GameState(object):

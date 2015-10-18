@@ -76,23 +76,25 @@ class TestMineMatrixMethods(unittest.TestCase):
 
     def test_init(self):
         """ Should create a MineMatrix. """
-        mines, size = 1, 5
-        minematrix = MineMatrix(mines, size)
-        self.assertTrue(minematrix)
+        size = 5
+        mine_matrix = MineMatrix(size)
+        self.assertTrue(mine_matrix)
+        self.assertEqual(size, mine_matrix.height)
+        self.assertEqual(size, mine_matrix.width)
 
     def test_exceed_mine_limit(self):
         """ Should raise InvalidMineAmount if too many mines we requested. """
-        size = 5  # 5x5 matrix
-        mines = size*size
-        self.assertRaises(InvalidMineAmount, MineMatrix, mines, size)
+        N = 5  # 5x5 matrix
+        mines = N*N
+        self.assertRaises(InvalidMineAmount, MineMatrix, N, mine_number=mines)
 
     def test_rand_coords(self):
         """ Should return coodinates that are within the limits. """
-        mines, size = 1, 2
-        minematrix = MineMatrix(mines, size)
-        (x, y) = minematrix._random_coord()
-        self.assertLess(x, minematrix.height)
-        self.assertLess(y, minematrix.width)
+        size = 2
+        mine_matrix = MineMatrix(size)
+        (x, y) = mine_matrix._random_coord()
+        self.assertLess(x, mine_matrix.height)
+        self.assertLess(y, mine_matrix.width)
 
 
 if __name__ == '__main__':
