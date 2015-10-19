@@ -1,4 +1,6 @@
 $(function(){
+    $('td').on('contextmenu', function(){return false;})
+
     var path = window.location.pathname;
 
     // Draw in pre-existing flags and "unsures" IF the game is still going
