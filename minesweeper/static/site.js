@@ -1,5 +1,6 @@
 $(function(){
     $('td').on('contextmenu', function(){return false;})
+    // var mines = parseInt($("#mine-count").text().split(' ')[1]);
 
     var path = window.location.pathname;
 
